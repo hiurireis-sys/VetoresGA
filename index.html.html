@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VetoresEdu — Geometria Analítica</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css"/>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0e1a;--surface:#111827;--card:#161e30;--border:#1f2d47;
+  --accent:#00d4ff;--accent2:#ff6b35;--accent3:#7c3aed;
+  --green:#10b981;--red:#ef4444;--yellow:#f59e0b;
+  --text:#e2e8f0;--muted:#64748b;
+  --font-head:'Syne',sans-serif;--font-mono:'Space Mono',monospace;--font-body:'DM Sans',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);overflow-x:hidden;min-height:100vh}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+button{cursor:pointer;border:none;outline:none;font-family:var(--font-body)}
+canvas{display:block}
+.katex{color:var(--text)!important;font-size:1em!important}
+
+/* HEADER */
+.header{background:linear-gradient(135deg,#0d1b2e,#111827);border-bottom:1px solid var(--border);padding:0 1rem;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;height:60px;gap:1rem}
+.logo{font-family:var(--font-mono);font-size:1rem;color:var(--accent);display:flex;align-items:center;gap:.4rem;white-space:nowrap}
+.logo-arrow{font-size:1.4rem;color:var(--accent2)}
+.nav-tabs{display:flex;gap:.2rem;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:3px;flex-wrap:wrap}
+.nav-tab{padding:.4rem .7rem;border-radius:7px;font-size:.78rem;font-weight:500;color:var(--muted);background:transparent;transition:all .2s;white-space:nowrap;cursor:pointer;border:none;font-family:var(--font-body)}
+.nav-tab:hover{color:var(--text);background:var(--border)}
+.nav-tab.active{color:var(--bg);background:var(--accent);font-weight:700}
+
+/* MAIN */
+.main{flex:1;padding:1.5rem;max-width:1100px;margin:0 auto;width:100%}
+.page{display:none}.page.active{display:block}
+.page-title{font-family:var(--font-head);font-size:1.7rem;font-weight:800;margin-bottom:.35rem;background:linear-gradient(135deg,var(--accent),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.page-sub{color:var(--muted);font-size:.88rem;margin-bottom:1.5rem}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#0d1b2e,#111827,#1a0a2e);border:1px solid var(--border);border-radius:14px;padding:2rem;margin-bottom:1.5rem;position:relative;overflow:hidden}
+.hero-title{font-family:var(--font-head);font-size:2rem;font-weight:800;margin-bottom:.4rem}
+.hero-title span{color:var(--accent)}
+.hero-sub{color:var(--muted);font-size:.92rem;max-width:480px;line-height:1.6}
+.hero-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.75rem;margin-top:1.5rem}
+.hero-card{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:.85rem;cursor:pointer;transition:all .2s;text-align:left}
+.hero-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.hc-icon{font-size:1.3rem;margin-bottom:.3rem}
+.hc-title{font-weight:700;font-size:.82rem;margin-bottom:.15rem}
+.hc-sub{font-size:.72rem;color:var(--muted)}
+.home-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem}
+.home-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.1rem}
+.home-card-title{font-family:var(--font-head);font-weight:700;margin-bottom:.4rem;display:flex;align-items:center;gap:.5rem}
+.home-card-body{font-size:.85rem;color:var(--muted);line-height:1.6}
+
+/* TEORIA */
+.teoria-grid{display:grid;grid-template-columns:210px 1fr;gap:1.25rem}
+.teoria-sidebar{display:flex;flex-direction:column;gap:.4rem;position:sticky;top:70px;height:fit-content}
+.teoria-btn{padding:.65rem .9rem;border-radius:8px;text-align:left;font-size:.8rem;background:var(--card);color:var(--muted);border:1px solid var(--border);transition:all .2s;cursor:pointer;font-family:var(--font-body);width:100%}
+.teoria-btn:hover{color:var(--text);border-color:var(--accent)}
+.teoria-btn.active{background:var(--accent);color:var(--bg);font-weight:700;border-color:var(--accent)}
+.teoria-content{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.75rem}
+.topic-title{font-family:var(--font-head);font-size:1.4rem;font-weight:800;color:var(--accent);margin-bottom:.85rem}
+.topic-body{line-height:2;color:var(--text);font-size:.93rem}
+.topic-body p{margin-bottom:1rem}
+.topic-panel{display:none}.topic-panel.active{display:block}
+
+/* caixas teoria */
+.box-def{background:rgba(16,185,129,.08);border-left:3px solid var(--green);padding:.75rem 1rem;border-radius:0 8px 8px 0;margin:.9rem 0}
+.box-def strong{color:var(--green);display:block;margin-bottom:.3rem;font-size:.85rem}
+.box-formula{background:linear-gradient(135deg,rgba(0,212,255,.07),rgba(124,58,237,.07));border:1px solid rgba(0,212,255,.25);border-radius:10px;padding:.9rem 1.2rem;margin:.9rem 0;text-align:center}
+.box-prop{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.6rem .85rem;margin-bottom:.4rem;display:flex;align-items:center;gap:.6rem;font-size:.88rem;flex-wrap:wrap}
+.prop-tag{background:var(--accent3);color:white;font-size:.68rem;font-weight:700;padding:.15rem .45rem;border-radius:4px;white-space:nowrap;flex-shrink:0}
+
+/* SIMULADOR */
+.sim-layout{display:flex;flex-direction:column;gap:1.25rem}
+.sim-canvas-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;position:relative}
+.sim-canvas-label{position:absolute;top:10px;left:10px;font-family:var(--font-mono);font-size:.68rem;color:var(--muted);background:rgba(10,14,26,.85);padding:3px 7px;border-radius:4px;z-index:1}
+.sim-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+.sim-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.1rem}
+.sim-card-title{font-family:var(--font-mono);font-size:.72rem;color:var(--accent);margin-bottom:.65rem;letter-spacing:.05em}
+.vec-block{margin-bottom:.85rem}
+.vec-block:last-child{margin-bottom:0}
+.vec-header{display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem}
+.vec-name{font-family:var(--font-mono);font-size:.9rem;font-weight:700}
+.color-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.vec-row{display:flex;align-items:center;gap:.4rem;margin-bottom:.3rem}
+.vec-lbl{font-size:.75rem;color:var(--muted);min-width:18px}
+.vec-input{flex:1;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:.38rem .55rem;font-family:var(--font-mono);font-size:.82rem}
+.vec-input:focus{border-color:var(--accent);outline:none}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:.32rem 0;border-bottom:1px solid var(--border);gap:.5rem}
+.stat-row:last-child{border-bottom:none}
+.stat-lbl{font-size:.78rem;color:var(--muted);flex-shrink:0}
+.stat-val{font-family:var(--font-mono);font-size:.82rem;color:var(--accent)}
+.sbtn{width:100%;padding:.55rem;border-radius:7px;background:linear-gradient(135deg,var(--accent),var(--accent3));color:var(--bg);font-weight:700;font-size:.82rem;transition:opacity .2s;margin-bottom:.4rem;cursor:pointer;border:none;font-family:var(--font-body)}
+.sbtn:last-child{margin-bottom:0}
+.sbtn:hover{opacity:.85}
+.sbtn.sec{background:var(--surface);color:var(--muted);border:1px solid var(--border)}
+.sbtn.sec:hover{color:var(--text);border-color:var(--accent)}
+.sbtn.active-op{background:var(--accent3);color:white}
+.op-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.4rem}
+
+/* QUIZ */
+.quiz-wrap{max-width:680px;margin:0 auto}
+.quiz-header{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.25rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:1rem}
+.quiz-score{background:linear-gradient(135deg,var(--accent3),var(--accent));border-radius:8px;padding:.45rem .9rem;font-family:var(--font-mono);font-size:1rem;font-weight:700;color:white;white-space:nowrap}
+.prog-bar{height:5px;background:var(--border);border-radius:3px;overflow:hidden;flex:1}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent3));border-radius:3px;transition:width .4s}
+.prog-text{font-size:.75rem;color:var(--muted);margin-top:.3rem;font-family:var(--font-mono)}
+.question-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.75rem}
+.q-label{font-family:var(--font-mono);font-size:.7rem;color:var(--accent2);margin-bottom:.65rem;letter-spacing:.1em}
+.q-text{font-size:1rem;font-weight:600;margin-bottom:1.25rem;line-height:1.7}
+.q-options{display:flex;flex-direction:column;gap:.65rem}
+.q-opt{padding:.85rem 1.1rem;border-radius:9px;text-align:left;background:var(--surface);border:1px solid var(--border);color:var(--text);font-size:.88rem;transition:all .2s;cursor:pointer;width:100%;font-family:var(--font-body);line-height:1.6}
+.q-opt:hover:not([disabled]){border-color:var(--accent);color:var(--accent)}
+.q-opt.correct{background:rgba(16,185,129,.15);border-color:var(--green);color:var(--green)}
+.q-opt.wrong{background:rgba(239,68,68,.15);border-color:var(--red);color:var(--red)}
+.q-opt[disabled]{cursor:default}
+.q-feedback{margin-top:1rem;padding:.9rem;border-radius:9px;font-size:.88rem;line-height:1.7;display:none}
+.q-feedback.show{display:block}
+.q-feedback.correct{background:rgba(16,185,129,.1);border:1px solid var(--green);color:var(--green)}
+.q-feedback.wrong{background:rgba(239,68,68,.1);border:1px solid var(--red);color:var(--red)}
+.quiz-nav{display:flex;justify-content:flex-end;margin-top:1rem}
+.quiz-next{padding:.65rem 1.4rem;border-radius:8px;background:var(--accent);color:var(--bg);font-weight:700;font-size:.88rem;cursor:pointer;border:none;font-family:var(--font-body);display:none}
+.quiz-next.show{display:block}
+.quiz-result{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:2.5rem 2rem;text-align:center;display:none}
+.quiz-result.show{display:block}
+.result-score{font-family:var(--font-head);font-size:3.5rem;font-weight:800;color:var(--accent)}
+.result-msg{font-size:1rem;color:var(--muted);margin:.4rem 0 1.75rem}
+.restart-btn{padding:.8rem 1.75rem;border-radius:9px;background:linear-gradient(135deg,var(--accent),var(--accent3));color:white;font-weight:700;font-size:.92rem;cursor:pointer;border:none;font-family:var(--font-body)}
+.wrong-list{margin-bottom:1.5rem;text-align:left;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.3);border-radius:9px;padding:.9rem}
+.wrong-list-title{font-family:var(--font-mono);font-size:.72rem;color:var(--red);margin-bottom:.4rem}
+.wrong-list-item{font-size:.82rem;color:var(--muted);margin-bottom:.25rem}
+
+/* EXERCICIOS */
+.ex-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.25rem}
+.ex-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.4rem}
+.ex-badge{display:inline-block;padding:.18rem .55rem;border-radius:20px;font-size:.68rem;font-family:var(--font-mono);margin-bottom:.65rem;font-weight:700}
+.ex-badge.basico{background:rgba(16,185,129,.2);color:var(--green)}
+.ex-badge.inter{background:rgba(245,158,11,.2);color:var(--yellow)}
+.ex-badge.avancado{background:rgba(239,68,68,.2);color:var(--red)}
+.ex-q{font-size:.9rem;line-height:1.7;margin-bottom:.85rem}
+.ex-textarea{width:100%;min-height:56px;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:.65rem;color:var(--text);font-family:var(--font-body);font-size:.85rem;resize:vertical}
+.ex-textarea:focus{border-color:var(--accent);outline:none}
+.ex-reveal{margin-top:.65rem;padding:.45rem .9rem;border-radius:6px;font-size:.8rem;background:var(--surface);border:1px solid var(--border);color:var(--muted);transition:all .2s;cursor:pointer;font-family:var(--font-body)}
+.ex-reveal:hover{border-color:var(--accent);color:var(--accent)}
+.ex-answer{margin-top:.65rem;padding:.75rem 1rem;border-radius:8px;background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.25);line-height:1.9;font-size:.88rem;display:none}
+.ex-answer.show{display:block}
+
+/* ATIVIDADES */
+.act-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.6rem;margin-bottom:1.25rem}
+.act-header{display:flex;align-items:flex-start;gap:.9rem;margin-bottom:1.1rem}
+.act-icon{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.25rem;flex-shrink:0}
+.act-title{font-family:var(--font-head);font-size:1rem;font-weight:700;margin-bottom:.2rem}
+.act-context{font-size:.86rem;color:var(--muted);line-height:1.6}
+.act-steps{list-style:none;display:flex;flex-direction:column;gap:.5rem;margin-bottom:.9rem}
+.act-step{display:flex;align-items:flex-start;gap:.65rem;font-size:.86rem;line-height:1.6;padding:.6rem .7rem;background:var(--surface);border-radius:7px}
+.step-num{background:var(--accent3);color:white;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;flex-shrink:0;margin-top:2px}
+.act-sol-btn{padding:.5rem 1.1rem;border-radius:7px;font-size:.8rem;background:var(--surface);border:1px solid var(--border);color:var(--muted);transition:all .2s;cursor:pointer;font-family:var(--font-body)}
+.act-sol-btn:hover{border-color:var(--accent2);color:var(--accent2)}
+.act-solution{margin-top:.65rem;padding:1rem;border-radius:9px;background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.3);line-height:1.9;font-size:.88rem;display:none}
+.act-solution.show{display:block}
+
+@media(max-width:640px){
+  .teoria-grid{grid-template-columns:1fr}
+  .teoria-sidebar{flex-direction:row;flex-wrap:wrap;position:static}
+  .nav-tab{font-size:.7rem;padding:.35rem .5rem}
+  .hero-title{font-size:1.4rem}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo"><span class="logo-arrow">→</span>VetoresEdu</div>
+  <nav class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('home',this)">Home</button>
+    <button class="nav-tab" onclick="showPage('teoria',this)">Teoria</button>
+    <button class="nav-tab" onclick="showPage('simulador',this)">Simulador</button>
+    <button class="nav-tab" onclick="showPage('exercicios',this)">Exercícios</button>
+    <button class="nav-tab" onclick="showPage('atividades',this)">Aplicações</button>
+    <button class="nav-tab" onclick="showPage('quiz',this)">Quiz</button>
+  </nav>
+</header>
+
+<div class="main">
+
+<!-- ═══ HOME ═══════════════════════════════════════════════════════════════ -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="hero-title">Aprenda <span>Vetores</span></div>
+    <div class="hero-sub">Abordagem completa: da intuição geométrica ao tratamento algébrico, com notação matemática precisa, simulações interativas e exercícios contextualizados.</div>
+    <div class="hero-cards">
+      <div class="hero-card" onclick="showPage('teoria',document.querySelectorAll('.nav-tab')[1])">
+        <div class="hc-icon">📐</div><div class="hc-title">Teoria</div><div class="hc-sub">6 tópicos com notação matemática</div>
+      </div>
+      <div class="hero-card" onclick="showPage('simulador',document.querySelectorAll('.nav-tab')[2])">
+        <div class="hc-icon">🎮</div><div class="hc-title">Simulador</div><div class="hc-sub">Visualização interativa</div>
+      </div>
+      <div class="hero-card" onclick="showPage('exercicios',document.querySelectorAll('.nav-tab')[3])">
+        <div class="hc-icon">✏️</div><div class="hc-title">Exercícios</div><div class="hc-sub">10 problemas graduados</div>
+      </div>
+      <div class="hero-card" onclick="showPage('atividades',document.querySelectorAll('.nav-tab')[4])">
+        <div class="hc-icon">🚀</div><div class="hc-title">Aplicações</div><div class="hc-sub">Problemas do mundo real</div>
+      </div>
+    </div>
+  </div>
+  <div class="home-grid">
+    <div class="home-card" style="border-left:3px solid var(--accent)">
+      <div class="home-card-title" style="color:var(--accent)">O que é um vetor?</div>
+      <div class="home-card-body">Um vetor possui módulo, direção e sentido. Representa grandezas como força, velocidade e deslocamento.</div>
+    </div>
+    <div class="home-card" style="border-left:3px solid var(--accent2)">
+      <div class="home-card-title" style="color:var(--accent2)">Tratamento Geométrico</div>
+      <div class="home-card-body">Vetores são segmentos orientados. Dois segmentos de mesmo módulo, direção e sentido representam o mesmo vetor.</div>
+    </div>
+    <div class="home-card" style="border-left:3px solid var(--accent3)">
+      <div class="home-card-title" style="color:var(--accent3)">Tratamento Algébrico</div>
+      <div class="home-card-body">Na base canônica, <span id="h3"></span> no plano e <span id="h4"></span> no espaço. Operações tornam-se operações com números reais.</div>
+    </div>
+    <div class="home-card" style="border-left:3px solid var(--green)">
+      <div class="home-card-title" style="color:var(--green)">Aplicações</div>
+      <div class="home-card-body">Essenciais em física, engenharia, computação gráfica, GPS e navegação.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TEORIA ══════════════════════════════════════════════════════════════ -->
+<div id="page-teoria" class="page">
+  <div class="page-title">Teoria</div>
+  <div class="page-sub">Fundamentos de vetores — tratamento geométrico e algébrico</div>
+  <div class="teoria-grid">
+    <div class="teoria-sidebar">
+      <button class="teoria-btn active" onclick="showTopic('nocao',this)">Noção de Vetores</button>
+      <button class="teoria-btn" onclick="showTopic('casos',this)">Casos Particulares</button>
+      <button class="teoria-btn" onclick="showTopic('adicao',this)">Adição de Vetores</button>
+      <button class="teoria-btn" onclick="showTopic('mult',this)">Mult. por Escalar</button>
+      <button class="teoria-btn" onclick="showTopic('coords',this)">Coordenadas — ℝ²</button>
+      <button class="teoria-btn" onclick="showTopic('espaco',this)">Vetores — ℝ³</button>
+    </div>
+    <div class="teoria-content">
+
+      <!-- NOÇÃO -->
+      <div id="topic-nocao" class="topic-panel active">
+        <div class="topic-title">Noção de Vetores</div>
+        <div class="topic-body">
+          <p>Existem dois tipos de grandezas: <strong style="color:var(--accent)">escalares</strong> e <strong style="color:var(--accent2)">vetoriais</strong>.</p>
+          <div class="box-def"><strong>Grandezas Escalares</strong>Ficam completamente definidas por um número real com unidade. Ex: comprimento, área, volume, massa, temperatura.</div>
+          <div class="box-def"><strong>Grandezas Vetoriais</strong>Precisam de <em>módulo</em>, <em>direção</em> e <em>sentido</em>. Ex: força, velocidade, aceleração.</div>
+          <p>Um <strong style="color:var(--accent)">vetor</strong> é representado por um segmento orientado, indicado por <span id="t1a"></span> ou <span id="t1b"></span>, onde <span id="t1c"></span> é a origem e <span id="t1d"></span> a extremidade.</p>
+          <div class="box-formula" id="t1e"></div>
+          <p>Dois segmentos orientados representam o <strong>mesmo vetor</strong> se têm mesmo módulo, mesma direção e mesmo sentido. Por isso o vetor é chamado <em>vetor livre</em>.</p>
+          <div class="box-def"><strong>Módulo do vetor</strong>O módulo de <span id="t1f"></span> é indicado por <span id="t1g"></span> ou <span id="t1h"></span>.</div>
+        </div>
+      </div>
+
+      <!-- CASOS PARTICULARES -->
+      <div id="topic-casos" class="topic-panel">
+        <div class="topic-title">Casos Particulares</div>
+        <div class="topic-body">
+          <div class="box-prop"><span class="prop-tag">Paralelos</span><span id="c1"></span><span>— representantes com mesma direção (mesmo ou oposto sentido)</span></div>
+          <div class="box-prop"><span class="prop-tag">Iguais</span><span id="c2"></span><span>— mesmo módulo, direção e sentido</span></div>
+          <div class="box-prop"><span class="prop-tag">Vetor Nulo</span><span id="c3"></span><span>— origem coincide com extremidade; paralelo a qualquer vetor</span></div>
+          <div class="box-prop"><span class="prop-tag">Oposto</span><span id="c4"></span><span>— mesmo módulo e direção, sentido contrário. Se <span id="c4b"></span>, então <span id="c4c"></span></span></div>
+          <div class="box-prop"><span class="prop-tag">Unitário</span><span id="c5"></span><span>— módulo igual a 1</span></div>
+          <div class="box-prop"><span class="prop-tag">Versor</span><span id="c6"></span><span>— vetor unitário de mesmo sentido de <span id="c6b"></span>: <span id="c6c"></span></span></div>
+          <div class="box-prop"><span class="prop-tag">Ortogonais</span><span id="c7"></span><span>— representantes formam ângulo reto</span></div>
+          <div class="box-prop"><span class="prop-tag">Coplanares</span><span></span><span>— existem em algum plano comum. Dois vetores quaisquer são sempre coplanares</span></div>
+        </div>
+      </div>
+
+      <!-- ADIÇÃO -->
+      <div id="topic-adicao" class="topic-panel">
+        <div class="topic-title">Adição de Vetores</div>
+        <div class="topic-body">
+          <p>Dados <span id="a1"></span> e <span id="a2"></span>, a soma <span id="a3"></span> é obtida pela <strong>Regra do Triângulo</strong> ou pela <strong>Regra do Paralelogramo</strong>.</p>
+          <div class="box-def"><strong>Regra do Triângulo</strong>Coloca-se <span id="a4"></span> com origem na extremidade de <span id="a5"></span>. A soma vai da origem de <span id="a6"></span> até a extremidade de <span id="a7"></span>.</div>
+          <div class="box-formula" id="a8"></div>
+          <p>Propriedades da adição (<span id="a9"></span> vetores quaisquer):</p>
+          <div class="box-prop"><span class="prop-tag">I — Comutativa</span><span id="a10"></span></div>
+          <div class="box-prop"><span class="prop-tag">II — Associativa</span><span id="a11"></span></div>
+          <div class="box-prop"><span class="prop-tag">III — Neutro</span><span id="a12"></span></div>
+          <div class="box-prop"><span class="prop-tag">IV — Oposto</span><span id="a13"></span></div>
+          <p style="margin-top:.9rem">O vetor <span id="a14"></span> escreve-se <span id="a15"></span> e é chamado <strong>diferença</strong>. No paralelogramo determinado por <span id="a16"></span> e <span id="a17"></span>, a soma e a diferença correspondem às duas diagonais.</p>
+        </div>
+      </div>
+
+      <!-- MULT ESCALAR -->
+      <div id="topic-mult" class="topic-panel">
+        <div class="topic-title">Multiplicação por Escalar</div>
+        <div class="topic-body">
+          <p>Dado <span id="m1"></span> e <span id="m2"></span>, o produto <span id="m3"></span> tem:</p>
+          <div class="box-prop"><span class="prop-tag">Módulo</span><span id="m4"></span></div>
+          <div class="box-prop"><span class="prop-tag">Direção</span><span id="m5"></span><span> é paralelo a </span><span id="m5b"></span></div>
+          <div class="box-prop"><span class="prop-tag">Sentido</span><span>mesmo sentido se <span id="m6"></span>; contrário se <span id="m7"></span></span></div>
+          <p style="margin-top:.9rem">Propriedades (<span id="m8"></span>; <span id="m9"></span> vetores quaisquer):</p>
+          <div class="box-prop"><span class="prop-tag">I</span><span id="m10"></span></div>
+          <div class="box-prop"><span class="prop-tag">II</span><span id="m11"></span></div>
+          <div class="box-prop"><span class="prop-tag">III</span><span id="m12"></span></div>
+          <div class="box-prop"><span class="prop-tag">IV</span><span id="m13"></span></div>
+          <div class="box-def" style="margin-top:1rem"><strong>Versor de <span id="m14"></span></strong><div id="m15" style="text-align:center;margin:.5rem 0"></div>É o vetor unitário de mesmo sentido de <span id="m16"></span>.</div>
+        </div>
+      </div>
+
+      <!-- COORDS R2 -->
+      <div id="topic-coords" class="topic-panel">
+        <div class="topic-title">Coordenadas — ℝ²</div>
+        <div class="topic-body">
+          <p>Na base canônica <span id="r1"></span> do plano <span id="r2"></span>, com <span id="r3"></span> e <span id="r4"></span>:</p>
+          <div class="box-formula" id="r5"></div>
+          <p><span id="r6"></span> é a <strong>abscissa</strong> e <span id="r7"></span> é a <strong>ordenada</strong> de <span id="r8"></span>.</p>
+          <p>Sejam <span id="r9"></span> e <span id="r10"></span>:</p>
+          <div class="box-prop"><span class="prop-tag">Soma</span><span id="r11"></span></div>
+          <div class="box-prop"><span class="prop-tag">Escalar</span><span id="r12"></span></div>
+          <div class="box-prop"><span class="prop-tag">Módulo</span><span id="r13"></span></div>
+          <div class="box-prop"><span class="prop-tag">Ponto médio</span><span id="r14"></span></div>
+          <div class="box-prop"><span class="prop-tag">Paralelismo</span><span id="r15"></span></div>
+          <div class="box-def" style="margin-top:1rem"><strong>Vetor por dois pontos</strong><div id="r16" style="text-align:center;margin:.5rem 0"></div></div>
+          <div class="box-def"><strong>Distância entre dois pontos</strong><div id="r17" style="text-align:center;margin:.5rem 0"></div></div>
+        </div>
+      </div>
+
+      <!-- ESPAÇO R3 -->
+      <div id="topic-espaco" class="topic-panel">
+        <div class="topic-title">Vetores — ℝ³</div>
+        <div class="topic-body">
+          <p>No espaço, a base canônica <span id="e1"></span> determina o sistema <span id="e2"></span>:</p>
+          <div class="box-prop"><span class="prop-tag">eixo x</span><span id="e3"></span></div>
+          <div class="box-prop"><span class="prop-tag">eixo y</span><span id="e4"></span></div>
+          <div class="box-prop"><span class="prop-tag">eixo z</span><span id="e5"></span></div>
+          <div class="box-formula" id="e6"></div>
+          <div class="box-prop"><span class="prop-tag">Módulo</span><span id="e7"></span></div>
+          <div class="box-prop"><span class="prop-tag">Ponto médio</span><span id="e8"></span></div>
+          <div class="box-prop"><span class="prop-tag">Paralelismo</span><span id="e9"></span></div>
+          <p style="margin-top:.9rem">No espaço, três vetores <strong>não-coplanares</strong> formam uma base: qualquer vetor do espaço é combinação linear única desses três vetores.</p>
+          <div class="box-def"><strong>Vetor por dois pontos em ℝ³</strong><div id="e10" style="text-align:center;margin:.5rem 0"></div></div>
+        </div>
+      </div>
+
+    </div><!-- fim teoria-content -->
+  </div>
+</div>
+
+<!-- ═══ SIMULADOR ════════════════════════════════════════════════════════════ -->
+<div id="page-simulador" class="page">
+  <div class="page-title">Simulador Interativo</div>
+  <div class="page-sub">Edite as componentes e visualize operações em tempo real</div>
+  <div class="sim-layout">
+    <div class="sim-canvas-wrap">
+      <div class="sim-canvas-label">Plano Cartesiano — edite os vetores no painel abaixo</div>
+      <canvas id="simCanvas" width="800" height="420" style="width:100%;height:auto;max-height:420px"></canvas>
+    </div>
+    <div class="sim-controls">
+      <div class="sim-card">
+        <div class="sim-card-title">VETORES</div>
+        <div class="vec-block">
+          <div class="vec-header"><span class="vec-name" style="color:#00d4ff">u</span><div class="color-dot" style="background:#00d4ff"></div></div>
+          <div class="vec-row"><span class="vec-lbl">x:</span><input class="vec-input" id="ux" type="number" step="0.5" value="3" oninput="redraw()"/><span class="vec-lbl">y:</span><input class="vec-input" id="uy" type="number" step="0.5" value="2" oninput="redraw()"/></div>
+        </div>
+        <div class="vec-block">
+          <div class="vec-header"><span class="vec-name" style="color:#ff6b35">v</span><div class="color-dot" style="background:#ff6b35"></div></div>
+          <div class="vec-row"><span class="vec-lbl">x:</span><input class="vec-input" id="vx" type="number" step="0.5" value="-1" oninput="redraw()"/><span class="vec-lbl">y:</span><input class="vec-input" id="vy" type="number" step="0.5" value="3" oninput="redraw()"/></div>
+        </div>
+      </div>
+      <div class="sim-card">
+        <div class="sim-card-title">PROPRIEDADES</div>
+        <div class="stat-row"><span class="stat-lbl" id="sl1"></span><span class="stat-val" id="sv1"></span></div>
+        <div class="stat-row"><span class="stat-lbl" id="sl2"></span><span class="stat-val" id="sv2"></span></div>
+        <div class="stat-row"><span class="stat-lbl" id="sl3"></span><span class="stat-val" id="sv3"></span></div>
+        <div class="stat-row"><span class="stat-lbl" id="sl4"></span><span class="stat-val" id="sv4"></span></div>
+        <div class="stat-row"><span class="stat-lbl" id="sl5"></span><span class="stat-val" id="sv5"></span></div>
+        <div class="stat-row"><span class="stat-lbl" id="sl6"></span><span class="stat-val" id="sv6"></span></div>
+        <div class="stat-row"><span class="stat-lbl" id="sl7"></span><span class="stat-val" id="sv7"></span></div>
+      </div>
+      <div class="sim-card">
+        <div class="sim-card-title">OPERAÇÕES</div>
+        <div class="op-grid">
+          <button class="sbtn sec" id="op-none" onclick="setOp('none')">Limpar</button>
+          <button class="sbtn sec" id="op-sum" onclick="setOp('sum')">u + v</button>
+          <button class="sbtn sec" id="op-diff" onclick="setOp('diff')">u − v</button>
+          <button class="sbtn sec" id="op-unit" onclick="setOp('unit')">Versor u</button>
+        </div>
+        <div class="sim-card-title" style="margin-top:1rem">PRESETS</div>
+        <button class="sbtn sec" style="font-size:.76rem;margin-bottom:.35rem" onclick="setPreset(1,0,0,1)">Base canônica (i e j)</button>
+        <button class="sbtn sec" style="font-size:.76rem;margin-bottom:.35rem" onclick="setPreset(3,0,0,2)">Perpendiculares</button>
+        <button class="sbtn sec" style="font-size:.76rem;margin-bottom:.35rem" onclick="setPreset(2,1,4,2)">Paralelos</button>
+        <button class="sbtn sec" style="font-size:.76rem" onclick="setPreset(3,2,-3,-2)">Sentidos opostos</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ EXERCÍCIOS ═══════════════════════════════════════════════════════════ -->
+<div id="page-exercicios" class="page">
+  <div class="page-title">Exercícios</div>
+  <div class="page-sub">10 problemas em 3 níveis — resolva antes de ver o gabarito</div>
+  <div class="ex-grid" id="ex-grid"></div>
+</div>
+
+<!-- ═══ ATIVIDADES ═══════════════════════════════════════════════════════════ -->
+<div id="page-atividades" class="page">
+  <div class="page-title">Aplicações</div>
+  <div class="page-sub">Problemas contextualizados com aplicações reais de vetores</div>
+  <div id="ativ-container"></div>
+</div>
+
+<!-- ═══ QUIZ ═════════════════════════════════════════════════════════════════ -->
+<div id="page-quiz" class="page">
+  <div class="page-title">Quiz</div>
+  <div class="page-sub">10 questões sobre os conceitos de vetores</div>
+  <div class="quiz-wrap">
+    <div class="quiz-header">
+      <div class="quiz-score" id="quiz-score">0 pts</div>
+      <div style="flex:1">
+        <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+        <div class="prog-text" id="prog-text">Questão 1 de 10</div>
+      </div>
+    </div>
+    <div class="question-card" id="question-card">
+      <div class="q-label" id="q-label">QUESTÃO 1</div>
+      <div class="q-text" id="q-text"></div>
+      <div class="q-options" id="q-options"></div>
+      <div class="q-feedback" id="q-feedback"></div>
+      <div class="quiz-nav"><button class="quiz-next" id="quiz-next" onclick="nextQuestion()">Próxima →</button></div>
+    </div>
+    <div class="quiz-result" id="quiz-result">
+      <div id="result-emoji" style="font-size:2.5rem;margin-bottom:.4rem"></div>
+      <div class="result-score" id="result-score"></div>
+      <div class="result-msg" id="result-msg"></div>
+      <div class="wrong-list" id="wrong-list" style="display:none">
+        <div class="wrong-list-title">QUESTÕES PARA REVISAR</div>
+        <div id="wrong-items"></div>
+      </div>
+      <button class="restart-btn" onclick="restartQuiz()">Tentar Novamente</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- fim main -->
+
+<script>
+// ─── NAVEGAÇÃO ───────────────────────────────────────────────────────────────
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (id === 'simulador') redraw();
+}
+
+function showTopic(id, btn) {
+  document.querySelectorAll('.topic-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.teoria-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('topic-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ─── KATEX HELPER ────────────────────────────────────────────────────────────
+function K(id, tex, display) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  function render() {
+    if (window.katex) {
+      katex.render(tex, el, { throwOnError: false, displayMode: !!display });
+    } else {
+      setTimeout(render, 100);
+    }
+  }
+  render();
+}
+
+// ─── RENDERIZA TODO O KATEX ──────────────────────────────────────────────────
+function renderAllKatex() {
+  // HOME
+  K('h3', '\\vec{v}=(x,y)'); K('h4', '\\vec{v}=(x,y,z)');
+
+  // TEORIA — Noção
+  K('t1a','\\vec{v}'); K('t1b','\\overrightarrow{AB}'); K('t1c','A'); K('t1d','B');
+  K('t1e','\\vec{v} = \\overrightarrow{AB}', true);
+  K('t1f','\\vec{v}'); K('t1g','|\\vec{v}|'); K('t1h','\\|\\vec{v}\\|');
+
+  // TEORIA — Casos
+  K('c1','\\vec{u}\\parallel\\vec{v}'); K('c2','\\vec{u}=\\vec{v}'); K('c3','\\vec{0}');
+  K('c4','-\\vec{v}'); K('c4b','\\vec{v}=\\overrightarrow{AB}'); K('c4c','-\\vec{v}=\\overrightarrow{BA}');
+  K('c5','|\\vec{u}|=1'); K('c6','\\hat{v}'); K('c6b','\\vec{v}'); K('c6c','\\hat{v}=\\dfrac{\\vec{v}}{|\\vec{v}|}');
+  K('c7','\\vec{u}\\perp\\vec{v}');
+
+  // TEORIA — Adição
+  K('a1','\\vec{u}'); K('a2','\\vec{v}'); K('a3','\\vec{u}+\\vec{v}');
+  K('a4','\\vec{v}'); K('a5','\\vec{u}'); K('a6','\\vec{u}'); K('a7','\\vec{v}');
+  K('a8','\\overrightarrow{AB}+\\overrightarrow{BC}=\\overrightarrow{AC}', true);
+  K('a9','\\vec{u},\\vec{v},\\vec{w}');
+  K('a10','\\vec{u}+\\vec{v}=\\vec{v}+\\vec{u}');
+  K('a11','(\\vec{u}+\\vec{v})+\\vec{w}=\\vec{u}+(\\vec{v}+\\vec{w})');
+  K('a12','\\vec{u}+\\vec{0}=\\vec{u}');
+  K('a13','\\vec{u}+(-\\vec{u})=\\vec{0}');
+  K('a14','\\vec{u}+(-\\vec{v})'); K('a15','\\vec{u}-\\vec{v}');
+  K('a16','\\vec{u}'); K('a17','\\vec{v}');
+
+  // TEORIA — Mult
+  K('m1','\\vec{v}\\neq\\vec{0}'); K('m2','\\alpha\\in\\mathbb{R},\\;\\alpha\\neq 0');
+  K('m3','\\alpha\\vec{v}'); K('m4','|\\alpha\\vec{v}|=|\\alpha|\\,|\\vec{v}|');
+  K('m5','\\alpha\\vec{v}'); K('m5b','\\vec{v}');
+  K('m6','\\alpha>0'); K('m7','\\alpha<0');
+  K('m8','\\alpha,\\beta\\in\\mathbb{R}'); K('m9','\\vec{u},\\vec{v}');
+  K('m10','(\\alpha\\beta)\\vec{v}=\\alpha(\\beta\\vec{v})');
+  K('m11','(\\alpha+\\beta)\\vec{v}=\\alpha\\vec{v}+\\beta\\vec{v}');
+  K('m12','\\alpha(\\vec{u}+\\vec{v})=\\alpha\\vec{u}+\\alpha\\vec{v}');
+  K('m13','1\\cdot\\vec{v}=\\vec{v}');
+  K('m14','\\vec{v}'); K('m15','\\hat{v}=\\dfrac{\\vec{v}}{|\\vec{v}|}', true); K('m16','\\vec{v}');
+
+  // TEORIA — Coords R2
+  K('r1','C=\\{\\vec{\\imath},\\vec{\\jmath}\\}'); K('r2','xOy');
+  K('r3','\\vec{\\imath}=(1,0)'); K('r4','\\vec{\\jmath}=(0,1)');
+  K('r5','\\vec{v}=x\\,\\vec{\\imath}+y\\,\\vec{\\jmath}=(x,\\,y)', true);
+  K('r6','x'); K('r7','y'); K('r8','\\vec{v}');
+  K('r9','\\vec{u}=(x_1,y_1)'); K('r10','\\vec{v}=(x_2,y_2)');
+  K('r11','\\vec{u}+\\vec{v}=(x_1+x_2,\\;y_1+y_2)');
+  K('r12','\\alpha\\vec{u}=(\\alpha x_1,\\;\\alpha y_1)');
+  K('r13','|\\vec{v}|=\\sqrt{x^2+y^2}');
+  K('r14','M=\\left(\\dfrac{x_1+x_2}{2},\\;\\dfrac{y_1+y_2}{2}\\right)');
+  K('r15','\\vec{u}\\parallel\\vec{v}\\iff\\dfrac{x_1}{x_2}=\\dfrac{y_1}{y_2}');
+  K('r16','\\overrightarrow{AB}=B-A=(x_2-x_1,\\;y_2-y_1)', true);
+  K('r17','d(A,B)=|\\overrightarrow{AB}|=\\sqrt{(x_2-x_1)^2+(y_2-y_1)^2}', true);
+
+  // TEORIA — Espaço R3
+  K('e1','\\{\\vec{\\imath},\\vec{\\jmath},\\vec{k}\\}'); K('e2','Oxyz');
+  K('e3','\\vec{\\imath}=(1,0,0)'); K('e4','\\vec{\\jmath}=(0,1,0)'); K('e5','\\vec{k}=(0,0,1)');
+  K('e6','\\vec{v}=x\\,\\vec{\\imath}+y\\,\\vec{\\jmath}+z\\,\\vec{k}=(x,y,z)', true);
+  K('e7','|\\vec{v}|=\\sqrt{x^2+y^2+z^2}');
+  K('e8','M=\\left(\\dfrac{x_1{+}x_2}{2},\\dfrac{y_1{+}y_2}{2},\\dfrac{z_1{+}z_2}{2}\\right)');
+  K('e9','\\dfrac{x_1}{x_2}=\\dfrac{y_1}{y_2}=\\dfrac{z_1}{z_2}');
+  K('e10','\\overrightarrow{AB}=B-A=(x_2-x_1,\\;y_2-y_1,\\;z_2-z_1)', true);
+
+  // Propriedades simulador
+  K('sl1','|\\vec{u}|'); K('sl2','|\\vec{v}|');
+  K('sl3','\\angle\\vec{u}'); K('sl4','\\angle\\vec{v}');
+  K('sl5','\\vec{u}\\cdot\\vec{v}');
+  K('sl6','\\vec{u}+\\vec{v}'); K('sl7','\\vec{u}-\\vec{v}');
+}
+
+// ─── EXERCÍCIOS ──────────────────────────────────────────────────────────────
+const EXERCICIOS = [
+  {nivel:'basico', qText:'Dados $A(2,1)$ e $B(5,4)$, determine as componentes do vetor $\\overrightarrow{AB}$.', ans:'\\overrightarrow{AB}=B-A=(5-2,\\;4-1)=(3,3)'},
+  {nivel:'basico', qText:'Calcule o módulo de $\\vec{v}=(-3,4)$.', ans:'|\\vec{v}|=\\sqrt{(-3)^2+4^2}=\\sqrt{9+16}=\\sqrt{25}=5'},
+  {nivel:'basico', qText:'Dados $\\vec{u}=(1,-2)$ e $\\vec{v}=(3,5)$, calcule $2\\vec{u}+\\vec{v}$.', ans:'2\\vec{u}=(2,-4).\\quad 2\\vec{u}+\\vec{v}=(2+3,\\;-4+5)=(5,1)'},
+  {nivel:'basico', qText:'Determine o versor de $\\vec{v}=(5,0)$.', ans:'|\\vec{v}|=5.\\quad \\hat{v}=\\dfrac{\\vec{v}}{5}=\\left(\\tfrac{5}{5},\\tfrac{0}{5}\\right)=(1,0)=\\vec{\\imath}'},
+  {nivel:'inter', qText:'Verifique se $\\vec{u}=(2,-4)$ e $\\vec{v}=(-3,6)$ são paralelos e determine o sentido.', ans:'\\dfrac{2}{-3}=-\\dfrac{2}{3}\\text{ e }\\dfrac{-4}{6}=-\\dfrac{2}{3}.\\text{ Proporção negativa: paralelos com sentidos contrários.}'},
+  {nivel:'inter', qText:'Dados $A(-1,2)$, $B(3,-1)$ e $C(2,4)$, determine $D$ tal que $\\overrightarrow{CD}=\\tfrac{1}{2}\\overrightarrow{AB}$.', ans:'\\overrightarrow{AB}=(4,-3),\\quad\\tfrac{1}{2}\\overrightarrow{AB}=\\left(2,-\\tfrac{3}{2}\\right).\\quad D=C+\\tfrac{1}{2}\\overrightarrow{AB}=\\left(4,\\;\\tfrac{5}{2}\\right)'},
+  {nivel:'inter', qText:'Encontre $\\alpha\\in\\mathbb{R}$ tal que $|\\alpha\\vec{v}|=10$, sendo $\\vec{v}=(3,4)$.', ans:'|\\vec{v}|=5.\\quad |\\alpha|\\cdot 5=10\\Rightarrow|\\alpha|=2\\Rightarrow\\alpha=2\\text{ ou }\\alpha=-2'},
+  {nivel:'avancado', qText:'No paralelogramo $ABCD$, $A(1,0)$, $B(4,1)$ e $C(5,3)$. Determine $D$.', ans:'\\overrightarrow{AB}=(3,1).\\quad D=C-\\overrightarrow{AB}=(5-3,\\;3-1)=(2,2)'},
+  {nivel:'avancado', qText:'Dados $\\vec{u}=(2,3,-1)$ e $\\vec{v}=(-1,0,2)$ em $\\mathbb{R}^3$, calcule $|\\vec{u}-2\\vec{v}|$.', ans:'2\\vec{v}=(-2,0,4).\\quad\\vec{u}-2\\vec{v}=(4,3,-5).\\quad|\\vec{u}-2\\vec{v}|=\\sqrt{16+9+25}=\\sqrt{50}=5\\sqrt{2}'},
+  {nivel:'avancado', qText:'Mostre que $P(1,-1,2)$, $Q(3,2,0)$ e $R(-1,-4,4)$ são colineares.', ans:'\\overrightarrow{PQ}=(2,3,-2).\\quad\\overrightarrow{PR}=(-2,-3,2)=-\\overrightarrow{PQ}.\\text{ Proporcionais }(\\alpha=-1)\\Rightarrow\\text{colineares.}'},
+];
+
+function buildExercicios() {
+  const grid = document.getElementById('ex-grid');
+  EXERCICIOS.forEach((ex, i) => {
+    const div = document.createElement('div');
+    div.className = 'ex-card';
+    const nivel = ex.nivel === 'basico' ? 'BÁSICO' : ex.nivel === 'inter' ? 'INTERMEDIÁRIO' : 'AVANÇADO';
+    div.innerHTML = `
+      <div class="ex-badge ${ex.nivel}">${nivel}</div>
+      <div class="ex-q" id="exq${i}">${i+1}. </div>
+      <textarea class="ex-textarea" placeholder="Digite sua resolução aqui..."></textarea>
+      <button class="ex-reveal" onclick="toggleAnswer(${i})">▼ Ver gabarito</button>
+      <div class="ex-answer" id="exans${i}"></div>
+    `;
+    grid.appendChild(div);
+    setTimeout(() => {
+      const qEl = document.getElementById('exq'+i);
+      // Renderiza inline math no enunciado
+      const qSpan = document.createElement('span');
+      qSpan.id = 'exq_k'+i;
+      qEl.appendChild(qSpan);
+      renderInlineTeX('exq_k'+i, ex.qText);
+      K('exans'+i, ex.ans, false);
+    }, 200);
+  });
+}
+
+function renderInlineTeX(id, text) {
+  // Substitui $...$ por spans katex
+  const el = document.getElementById(id);
+  if (!el) return;
+  function go() {
+    if (!window.katex) { setTimeout(go, 100); return; }
+    const parts = text.split(/\$([^$]+)\$/g);
+    el.innerHTML = '';
+    parts.forEach((p, i) => {
+      if (i % 2 === 0) {
+        el.appendChild(document.createTextNode(p));
+      } else {
+        const s = document.createElement('span');
+        katex.render(p, s, { throwOnError: false, displayMode: false });
+        el.appendChild(s);
+      }
+    });
+  }
+  go();
+}
+
+function toggleAnswer(i) {
+  const ans = document.getElementById('exans'+i);
+  const btn = ans.previousElementSibling;
+  if (ans.classList.contains('show')) {
+    ans.classList.remove('show');
+    btn.textContent = '▼ Ver gabarito';
+  } else {
+    ans.classList.add('show');
+    btn.textContent = '▲ Esconder gabarito';
+  }
+}
+
+// ─── ATIVIDADES ───────────────────────────────────────────────────────────────
+const ATIVIDADES = [
+  {icon:'✈️', bg:'rgba(0,212,255,0.1)', title:'Navegação Aérea',
+   context:'Um avião voa a 400 km/h na direção Nordeste (40° a partir do Norte). O vento sopra a 50 km/h para Leste. Determine a velocidade resultante.',
+   steps:['$\\vec{v}_{\\text{avião}}=(400\\sin 40°,\\;400\\cos 40°)\\approx(257{,}1;\\;306{,}4)\\;\\text{km/h}$','$\\vec{v}_{\\text{vento}}=(50,\\;0)\\;\\text{km/h}$','Some os vetores: $\\vec{v}_{res}=(307{,}1;\\;306{,}4)\\;\\text{km/h}$','Módulo: $|\\vec{v}_{res}|=\\sqrt{307{,}1^2+306{,}4^2}\\approx434\\;\\text{km/h}$'],
+   sol:'O avião voa a aproximadamente <strong style="color:var(--accent2)">434 km/h</strong>, com desvio de ≈45° em relação ao Norte.'},
+  {icon:'⚽', bg:'rgba(16,185,129,0.1)', title:'Força Resultante',
+   context:'Dois jogadores aplicam forças: F₁ = (3, 4) N e F₂ = (−1, 2) N. Determine a força resultante e seu módulo.',
+   steps:['$\\vec{F}_{res}=(3+(-1),\\;4+2)=(2,6)\\;\\text{N}$','$|\\vec{F}_{res}|=\\sqrt{4+36}=\\sqrt{40}=2\\sqrt{10}\\approx6{,}32\\;\\text{N}$'],
+   sol:'Força resultante: $(2, 6)$ N com módulo $\\approx 6{,}32$ N.'},
+  {icon:'🗺️', bg:'rgba(124,58,237,0.1)', title:'GPS e Deslocamento',
+   context:'Uma pessoa parte de A(−2, 3) na direção do vetor v = (4, −1). Após percorrer distância 3|v|, em que ponto B ela chega?',
+   steps:['Módulo: $|\\vec{v}|=\\sqrt{16+1}=\\sqrt{17}$','Deslocamento: $3\\vec{v}=3(4,-1)=(12,-3)$','Ponto de chegada: $B=A+3\\vec{v}=(-2{+}12,\\;3{-}3)=(10,0)$'],
+   sol:'$B=(10,\\;0)$. Distância percorrida: $3\\sqrt{17}\\approx12{,}4$ unidades de comprimento.'},
+  {icon:'🏗️', bg:'rgba(245,158,11,0.1)', title:'Equilíbrio de Forças',
+   context:'Uma ponte tem três cabos: F₁ = (0, 500), F₂ = (200, −300) e F₃ = (a, b). Para equilíbrio, F₁ + F₂ + F₃ = 0. Determine F₃.',
+   steps:['Condição de equilíbrio: $\\vec{F}_1+\\vec{F}_2+\\vec{F}_3=\\vec{0}$','Portanto: $\\vec{F}_3=-(\\vec{F}_1+\\vec{F}_2)$','$\\vec{F}_1+\\vec{F}_2=(200,\\;200)$','$\\vec{F}_3=(-200,\\;-200)\\;\\text{N}$, $\\;|\\vec{F}_3|=200\\sqrt{2}\\approx283\\;\\text{N}$'],
+   sol:'$\\vec{F}_3=(-200,\\;-200)\\;\\text{N}$ com módulo $\\approx 283$ N.'},
+];
+
+function buildAtividades() {
+  const cont = document.getElementById('ativ-container');
+  ATIVIDADES.forEach((a, i) => {
+    const div = document.createElement('div');
+    div.className = 'act-card';
+    div.innerHTML = `
+      <div class="act-header">
+        <div class="act-icon" style="background:${a.bg}">${a.icon}</div>
+        <div><div class="act-title">${a.title}</div><div class="act-context">${a.context}</div></div>
+      </div>
+      <ul class="act-steps" id="asteps${i}"></ul>
+      <button class="act-sol-btn" onclick="toggleSol(${i})">▼ Ver solução</button>
+      <div class="act-solution" id="asol${i}"></div>
+    `;
+    cont.appendChild(div);
+    setTimeout(() => {
+      const ul = document.getElementById('asteps'+i);
+      a.steps.forEach((s, j) => {
+        const li = document.createElement('li');
+        li.className = 'act-step';
+        li.innerHTML = `<div class="step-num">${j+1}</div><span id="as${i}_${j}"></span>`;
+        ul.appendChild(li);
+        renderInlineTeX('as'+i+'_'+j, s);
+      });
+      renderInlineTeX('asol'+i, a.sol);
+    }, 200);
+  });
+}
+
+function toggleSol(i) {
+  const sol = document.getElementById('asol'+i);
+  const btn = sol.previousElementSibling;
+  if (sol.classList.contains('show')) {
+    sol.classList.remove('show'); btn.textContent = '▼ Ver solução';
+  } else {
+    sol.classList.add('show'); btn.textContent = '▲ Ocultar solução';
+  }
+}
+
+// ─── QUIZ ─────────────────────────────────────────────────────────────────────
+const QUIZ = [
+  {q:'O que define completamente uma grandeza vetorial?', opts:['Apenas o módulo','Módulo e direção','Módulo, direção e sentido','Apenas a direção'], ans:2, exp:'Uma grandeza vetorial precisa de módulo, direção e sentido para ficar completamente determinada.'},
+  {q:'Dois vetores $\\vec{u}$ e $\\vec{v}$ são iguais quando:', opts:['Têm o mesmo módulo','Têm a mesma direção','Têm mesmo módulo e direção','Têm mesmo módulo, direção e sentido'], ans:3, exp:'Para igualdade vetorial é necessário e suficiente: mesmo módulo, mesma direção E mesmo sentido.'},
+  {q:'Dados $\\vec{u}=(2,-3)$ e $\\vec{v}=(-1,4)$, qual é $\\vec{u}+\\vec{v}$?', opts:['$(1,\\,1)$','$(3,\\,-7)$','$(1,\\,7)$','$(-1,\\,1)$'], ans:0, exp:'Somando componente a componente: $(2+(-1),\\; -3+4)=(1,1)$.'},
+  {q:'O módulo do vetor $\\vec{v}=(3,-4)$ é:', opts:['$7$','$1$','$5$','$\\sqrt{7}$'], ans:2, exp:'$|\\vec{v}|=\\sqrt{3^2+(-4)^2}=\\sqrt{9+16}=\\sqrt{25}=5$.'},
+  {q:'Se $\\alpha>0$ e $\\vec{v}\\neq\\vec{0}$, o vetor $\\alpha\\vec{v}$ em relação a $\\vec{v}$:', opts:['Tem sentido contrário','Tem mesmo sentido','Tem direção perpendicular','Não é paralelo'], ans:1, exp:'Quando $\\alpha>0$, o produto $\\alpha\\vec{v}$ preserva a direção e o sentido de $\\vec{v}$, escalando o módulo por $|\\alpha|$.'},
+  {q:'O versor de $\\vec{v}=(6,8)$ é:', opts:['$(0{,}6;\\;0{,}8)$','$(6/14;\\;8/14)$','$(1/6;\\;1/8)$','$(-0{,}6;\\;-0{,}8)$'], ans:0, exp:'$|\\vec{v}|=\\sqrt{36+64}=10$. Versor $=\\vec{v}/|\\vec{v}|=(6/10,\\;8/10)=(0{,}6;\\;0{,}8)$.'},
+  {q:'Os vetores $\\vec{u}=(-2,3)$ e $\\vec{v}=(-4,6)$ são:', opts:['Perpendiculares','Paralelos e mesmo sentido','Paralelos e sentido contrário','Iguais'], ans:1, exp:'$\\tfrac{-2}{-4}=\\tfrac{1}{2}$ e $\\tfrac{3}{6}=\\tfrac{1}{2}$. Proporção positiva: paralelos com mesmo sentido.'},
+  {q:'Dados $A(1,2)$ e $B(4,6)$, o vetor $\\overrightarrow{AB}$ tem componentes:', opts:['$(5,\\,8)$','$(3,\\,4)$','$(-3,\\,-4)$','$(4,\\,6)$'], ans:1, exp:'$\\overrightarrow{AB}=B-A=(4-1,\\;6-2)=(3,4)$.'},
+  {q:'A adição de vetores satisfaz a propriedade comutativa:', opts:['$\\vec{u}+\\vec{v}=\\vec{0}$','$\\vec{u}+\\vec{v}=\\vec{v}+\\vec{u}$','$\\vec{u}+\\vec{0}=\\vec{u}$','$\\vec{u}\\cdot\\vec{v}=\\vec{v}\\cdot\\vec{u}$'], ans:1, exp:'A propriedade comutativa afirma que $\\vec{u}+\\vec{v}=\\vec{v}+\\vec{u}$ para quaisquer vetores.'},
+  {q:'Qual ponto $P(x,0)$ do eixo $Ox$ é equidistante de $A(0,3)$ e $B(4,0)$?', opts:['$P\\!\\left(\\tfrac{7}{8},0\\right)$','$P(2,0)$','$P(4,0)$','$P\\!\\left(\\tfrac{7}{2},0\\right)$'], ans:0, exp:'$d(P,A)^2=x^2+9$ e $d(P,B)^2=(x-4)^2$. Igualando: $8x=7\\Rightarrow x=\\tfrac{7}{8}$.'},
+];
+
+let qCur=0, qScore=0, qWrong=[], qAnswered=false;
+
+function buildQuiz() { renderQuestion(); }
+
+function renderQuestion() {
+  const q = QUIZ[qCur];
+  document.getElementById('q-label').textContent = 'QUESTÃO '+(qCur+1);
+  document.getElementById('prog-fill').style.width = (qCur/QUIZ.length*100)+'%';
+  document.getElementById('prog-text').textContent = 'Questão '+(qCur+1)+' de '+QUIZ.length;
+  document.getElementById('quiz-score').textContent = qScore+' pts';
+  const qtEl = document.getElementById('q-text');
+  qtEl.innerHTML = '';
+  renderInlineTeX_el(qtEl, q.q);
+
+  const opts = document.getElementById('q-options');
+  opts.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'q-opt';
+    btn.innerHTML = '<span style="font-family:var(--font-mono);color:var(--muted);margin-right:.5rem">'+['A','B','C','D'][i]+')</span>';
+    const span = document.createElement('span');
+    renderInlineTeX_el(span, opt);
+    btn.appendChild(span);
+    btn.onclick = () => pickAnswer(i);
+    opts.appendChild(btn);
+  });
+
+  document.getElementById('q-feedback').className = 'q-feedback';
+  document.getElementById('quiz-next').className = 'quiz-next';
+  qAnswered = false;
+}
+
+function renderInlineTeX_el(el, text) {
+  function go() {
+    if (!window.katex) { setTimeout(go, 80); return; }
+    const parts = text.split(/\$([^$]+)\$/g);
+    el.innerHTML = '';
+    parts.forEach((p, i) => {
+      if (i % 2 === 0) { el.appendChild(document.createTextNode(p)); }
+      else {
+        const s = document.createElement('span');
+        try { katex.render(p, s, { throwOnError: false }); }
+        catch(e) { s.textContent = p; }
+        el.appendChild(s);
+      }
+    });
+  }
+  go();
+}
+
+function pickAnswer(i) {
+  if (qAnswered) return;
+  qAnswered = true;
+  const q = QUIZ[qCur];
+  const btns = document.querySelectorAll('.q-opt');
+  btns.forEach(b => b.disabled = true);
+  btns[q.ans].classList.add('correct');
+  if (i !== q.ans) { btns[i].classList.add('wrong'); qWrong.push(qCur); }
+  else { qScore++; document.getElementById('quiz-score').textContent = qScore+' pts'; }
+
+  const fb = document.getElementById('q-feedback');
+  fb.className = 'q-feedback show '+(i===q.ans?'correct':'wrong');
+  const prefix = i===q.ans ? '✓ Correto! ' : '✗ Incorreto. ';
+  const prefixNode = document.createTextNode(prefix);
+  fb.innerHTML = '';
+  fb.appendChild(prefixNode);
+  renderInlineTeX_el(fb, q.exp);
+
+  const nxt = document.getElementById('quiz-next');
+  nxt.className = 'quiz-next show';
+  nxt.textContent = (qCur+1 < QUIZ.length) ? 'Próxima →' : 'Ver Resultado →';
+}
+
+function nextQuestion() {
+  qCur++;
+  if (qCur >= QUIZ.length) { showResult(); return; }
+  renderQuestion();
+}
+
+function showResult() {
+  document.getElementById('question-card').style.display = 'none';
+  const res = document.getElementById('quiz-result');
+  res.className = 'quiz-result show';
+  const pct = Math.round(qScore/QUIZ.length*100);
+  document.getElementById('result-emoji').textContent = pct>=80?'🎉':pct>=60?'👍':'📚';
+  document.getElementById('result-score').textContent = qScore+'/'+QUIZ.length;
+  document.getElementById('result-msg').textContent = pct>=80?'Excelente! Você domina vetores!':pct>=60?'Bom trabalho! Revise alguns conceitos.':'Continue estudando! Você consegue!';
+  if (qWrong.length > 0) {
+    const wl = document.getElementById('wrong-list');
+    wl.style.display = 'block';
+    const wi = document.getElementById('wrong-items');
+    wi.innerHTML = '';
+    qWrong.forEach(i => { const d=document.createElement('div'); d.className='wrong-list-item'; d.textContent='• Questão '+(i+1); wi.appendChild(d); });
+  }
+}
+
+function restartQuiz() {
+  qCur=0; qScore=0; qWrong=[]; qAnswered=false;
+  document.getElementById('question-card').style.display='block';
+  document.getElementById('quiz-result').className='quiz-result';
+  document.getElementById('wrong-list').style.display='none';
+  renderQuestion();
+}
+
+// ─── SIMULADOR ────────────────────────────────────────────────────────────────
+let simOp = 'none';
+const scale = 45;
+
+function setOp(op) {
+  simOp = op;
+  ['none','sum','diff','unit'].forEach(o => {
+    const btn = document.getElementById('op-'+o);
+    btn.className = 'sbtn '+(op===o?'active-op':'sec');
+  });
+  redraw();
+}
+
+function setPreset(ux,uy,vx,vy) {
+  document.getElementById('ux').value=ux; document.getElementById('uy').value=uy;
+  document.getElementById('vx').value=vx; document.getElementById('vy').value=vy;
+  setOp('none');
+}
+
+function redraw() {
+  const canvas = document.getElementById('simCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height, ox=W/2, oy=H/2;
+  const ux=parseFloat(document.getElementById('ux').value)||0;
+  const uy=parseFloat(document.getElementById('uy').value)||0;
+  const vx=parseFloat(document.getElementById('vx').value)||0;
+  const vy=parseFloat(document.getElementById('vy').value)||0;
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#0a0e1a'; ctx.fillRect(0,0,W,H);
+
+  // grade
+  ctx.strokeStyle='rgba(31,45,71,.9)'; ctx.lineWidth=1;
+  for(let x=ox%scale;x<W;x+=scale){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=oy%scale;y<H;y+=scale){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+  // eixos
+  ctx.strokeStyle='rgba(148,163,184,.7)'; ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(0,oy);ctx.lineTo(W,oy);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(ox,0);ctx.lineTo(ox,H);ctx.stroke();
+
+  // setas eixos
+  ctx.fillStyle='rgba(148,163,184,.8)';
+  ctx.beginPath();ctx.moveTo(W-3,oy);ctx.lineTo(W-13,oy-5);ctx.lineTo(W-13,oy+5);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(ox,3);ctx.lineTo(ox-5,13);ctx.lineTo(ox+5,13);ctx.closePath();ctx.fill();
+
+  // labels
+  ctx.fillStyle='#94a3b8'; ctx.font='bold 13px Space Mono,monospace';
+  ctx.fillText('x',W-16,oy-10); ctx.fillText('y',ox+10,14); ctx.fillText('O',ox+6,oy+17);
+
+  ctx.fillStyle='rgba(100,116,139,.55)'; ctx.font='9px Space Mono,monospace';
+  for(let i=-5;i<=5;i++){
+    if(i===0)continue;
+    ctx.strokeStyle='rgba(100,116,139,.35)'; ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(ox+i*scale,oy-3);ctx.lineTo(ox+i*scale,oy+3);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(ox-3,oy-i*scale);ctx.lineTo(ox+3,oy-i*scale);ctx.stroke();
+    ctx.fillStyle='rgba(100,116,139,.55)';
+    ctx.fillText(i,ox+i*scale-4,oy+15);
+    ctx.fillText(i>0?i:-i,ox+6,oy-i*scale+4);
+  }
+
+  function arrow(x1,y1,x2,y2,color,label,lw){
+    lw=lw||2.5;
+    const ang=Math.atan2(y2-y1,x2-x1);
+    const len=Math.hypot(x2-x1,y2-y1);
+    if(len<2)return;
+    const hl=Math.min(16,len*.28);
+    ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=lw;
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-hl*Math.cos(ang-.38),y2-hl*Math.sin(ang-.38));
+    ctx.lineTo(x2-hl*Math.cos(ang+.38),y2-hl*Math.sin(ang+.38));
+    ctx.closePath();ctx.fill();
+    if(label){
+      ctx.font='bold 13px Space Mono,monospace';
+      const px=(x1+x2)/2+14*Math.cos(ang-Math.PI/2);
+      const py=(y1+y2)/2+14*Math.sin(ang-Math.PI/2);
+      ctx.fillStyle=color; ctx.fillText(label,px-5,py+4);
+    }
+  }
+
+  arrow(ox,oy,ox+ux*scale,oy-uy*scale,'#00d4ff','u');
+  arrow(ox,oy,ox+vx*scale,oy-vy*scale,'#ff6b35','v');
+
+  if(simOp==='sum'){
+    const sx=ux+vx,sy=uy+vy;
+    arrow(ox+ux*scale,oy-uy*scale,ox+sx*scale,oy-sy*scale,'#a78bfa',null,1.8);
+    arrow(ox,oy,ox+sx*scale,oy-sy*scale,'#10b981','u+v',2.8);
+  }
+  if(simOp==='diff'){
+    const dx=ux-vx,dy=uy-vy;
+    arrow(ox,oy,ox+dx*scale,oy-dy*scale,'#f59e0b','u-v',2.8);
+  }
+  if(simOp==='unit'){
+    const m=Math.hypot(ux,uy);
+    if(m>0)arrow(ox,oy,ox+(ux/m)*scale,oy-(uy/m)*scale,'#f59e0b','u^',3);
+  }
+
+  // atualiza stats
+  const mu=Math.hypot(ux,uy).toFixed(3);
+  const mv=Math.hypot(vx,vy).toFixed(3);
+  const au=(Math.atan2(uy,ux)*180/Math.PI).toFixed(1);
+  const av=(Math.atan2(vy,vx)*180/Math.PI).toFixed(1);
+  const dot=(ux*vx+uy*vy).toFixed(3);
+  document.getElementById('sv1').textContent=mu;
+  document.getElementById('sv2').textContent=mv;
+  document.getElementById('sv3').textContent=au+'°';
+  document.getElementById('sv4').textContent=av+'°';
+  document.getElementById('sv5').textContent=dot;
+  document.getElementById('sv6').textContent='('+(ux+vx).toFixed(2)+', '+(uy+vy).toFixed(2)+')';
+  document.getElementById('sv7').textContent='('+(ux-vx).toFixed(2)+', '+(uy-vy).toFixed(2)+')';
+}
+
+// ─── INIT ──────────────────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    renderAllKatex();
+    buildExercicios();
+    buildAtividades();
+    buildQuiz();
+    redraw();
+  }, 300);
+});
+</script>
+</body>
+</html>
